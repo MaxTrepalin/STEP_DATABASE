@@ -5,8 +5,7 @@
 #include <QString>
 #include <QtSql/QSqlTableModel>
 #include <QtSql/QSqlRelationalTableModel>
-
-
+#include <QDir>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -21,8 +20,6 @@ MainWindow::~MainWindow()
     delete ui;
 
 }
-
-
 
 void MainWindow::on_push_import_clicked()
 {
@@ -56,7 +53,7 @@ void MainWindow::on_button_clear_clicked()
            model->removeRow(selectedRow);
      model->select();
         } else {
-            ui->statusbar->showMessage( "no row");
+            ui->statusbar->showMessage( "нет строки");
         }
     }
 }
@@ -70,3 +67,29 @@ void MainWindow::on_push_add_clicked()
 {
       model->insertRow(model->rowCount());
 }
+
+void MainWindow::on_push_export_clicked()
+{
+    data_export = ui->input_path->text();
+    ui->statusbar->showMessage("База данных экспортирована в CSV" + data_export);
+
+    QSqlQuery query = QSqlQuery(db);
+    if (!query.exec("select* from table_person"))
+    {
+        return;
+            }
+    while (query.next()) {
+        export_all = export_all + query.value(0).toString() + ";"+
+                query.value(1).toString() + ";" + query.value(2).toString() + "\n";}
+
+
+    QString path = "C:\\Max_Trepalin\\STEP_database\\Step_database\\Step_base222.csv";
+    QFile file(path);
+    if (file.open(QIODevice::WriteOnly))
+    {
+    file.write(export_all.toLocal8Bit());
+    file.close();
+    }
+     file.close();
+    }
+
